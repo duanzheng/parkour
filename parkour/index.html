@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>跑步积分赛，抽奖赢豪礼</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<meta name="screen-orientation" content="portrait">
+	<meta name="x5-orientation" content="portrait">
+	<link rel="stylesheet" type="text/css" href="./css/parkour.min.css?081104">
+</head>
+<body ms-controller="parkour">
+	<div id="view-main">
+		<div id="main-head" class="topbar">
+			<div id="total-life" onclick="showSharePrompt()">{{@totalLife}}</div>
+		</div>
+		<div id="load-progress">
+			<div class="text">选手热身中…</div>
+			<div class="base">
+				<div class="bar" ms-css="{width: @preloadPercent + '%'}"></div>
+				<div class="percent">{{@preloadPercent}}%</div>
+			</div>
+		</div>
+		<div id="main-obstacle"></div>
+		<div id="main-bottom">
+			<div id="my-gift" onclick="handleShowMyGift()">我的奖品</div>
+			<div id="total-score">当前积分:{{@totalIntegral}}</div>
+			<div id="broadcast">
+				<div class="broadcast-wrapper" style="">
+					<div ms-for="el in @broadcastList" class="broadcast-slide">{{el}}</div>
+				</div>
+			</div>
+			<div id="btn-lucky" onclick="handleShowLucky()"></div>
+			<div id="btn-begin"></div>
+			<div id="btn-rule" onclick="handleShowRule()"></div>
+			<div id="btn-friends" onclick="handleShowFriends()">
+			</div>
+		</div>
+	</div>
+	<div id="view-game">
+		<div id="score-head" class="topbar">
+			<div id="scrore" class="score">{{@curIntegral}}</div>
+			<div id="time" class="time">{{@costSeconds}}s</div>
+		</div>
+		<div id="count-down" class="bg-3"></div>
+		<div id="obstacle-prompt">
+			<div class="obstacle-name">眩晕</div>
+			<div class="time">{{@vertigoTime}}</div>
+		</div>
+		<!-- <div id="frame-rate" style="position: absolute;left: 0;bottom: 0;color: #FFF;font-size: 20px;">{{@frameRate}}FPS</div> -->
+	</div>
+	<div id="popup-container">
+		<div id="popup-rule" class="popup-item">
+			<div class="text">
+				<img src="./img/rule.jpg">
+			</div>
+			<div class="btn-close-popup" onclick="handleClosePopup()"></div>
+		</div>
+		<div id="popup-friend" class="popup-item">
+			<div class="title">已有{{@friendsNum}}位好友帮助了{{@userName}}</div>
+			<ul class="user-list">
+				<li ms-for="el in @friendsList">
+					<div class="head">
+						<img ms-attr="{src:el.headimgurl}">
+					</div>
+					<div class="text-container">
+						<div class="name">{{el.donaterName}}</div>
+						<div class="describe">帮忙恢复了1点生命，快去感谢TA</div>
+					</div>
+				</li>
+			</ul>
+			<div class="btn-close-popup" onclick="handleClosePopup()"></div>
+		</div>
+		<div id="popup-lucky" class="popup-item">
+			<div class="btn-close" onclick="handleCloseDraw()"></div>
+			<div class="point-num">{{@totalIntegral}}</div>
+			<div class="game-container">
+				<div class="game-item">
+					<img src="./img/card_back.png">
+				</div>
+				<div class="game-item">
+					<img src="./img/card_back.png">
+				</div>
+				<div class="game-item">
+					<img src="./img/card_back.png">
+				</div>
+			</div>
+			<div class="btn-begin-luck" onclick="handleBeginDraw()"></div>
+			<div class="btn-show-gift" onclick="handleShowAllGift()"></div>
+		</div>
+		<div id="popup-game-result" class="popup-item">
+			<div class="btn-close" onclick="handleReturnMain()"></div>
+			<div class="base-score">+{{@baseScore}}</div>
+			<div class="game-score">+{{@curIntegral}}</div>
+			<div class="time-score">+{{@timeScore}}</div>
+			<div class="game-total-score">总积分 +{{@totalGameScore}}</div>
+			<div class="btn-ok" onclick="handleReturnMain()"></div>
+		</div>
+		<div id="popup-my-gift" class="popup-item">
+			<div class="btn-close" onclick="handleClosePopup()"></div>
+			<div class="btn-ensure" onclick="handleClosePopup()"></div>
+			<ul class="gift-list">
+				<li ms-for="el in @myGiftList">
+					<div class="name">{{el.goodsName}}</div>
+					<div class="num">{{el.count}}</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div id="popup-secondary">
+		<div id="gift-list" class="secondary-popup-item">
+			<div class="content-list">
+				<img src="./img/gift_list.jpg">
+			</div>
+			<div class="close-btn" onclick="handleCloseSecondaryPopup()"></div>
+		</div>
+		<div id="draw-result" class="secondary-popup-item">
+			<div class="text">
+				<span style="font-size: 22px">￥</span><span class="value" style="font-size: 26px;"></span>
+			</div>
+			<div class="btn-close" onclick="handleCloseDrawPopup()"></div>
+		</div>
+		<div id="draw-result-real" class="secondary-popup-item">
+			<div class="text">
+				
+			</div>
+			<form id="user-info">
+				<input id="user-name" class="draw-result-input" type="text" name="" placeholder="请输入您的姓名">
+				<input id="user-phone" class="draw-result-input" type="tel" name="" placeholder="请输入手机号">
+				<div id="user-expr-container">
+					<input id="user-expr" class="draw-result-input" style="height: 100%;" type="text" name="" placeholder="请选择一个体验馆" disabled="disabled">
+					<span class="input-arrow"></span>
+				</div>
+			</form>
+			<div class="btn-close" onclick="handleCloseDrawPopup()"></div>
+			<div class="btn-submit" onclick="handleSubmitUserMsg()"></div>
+		</div>
+		<div id="draw-failed" class="secondary-popup-item">
+			<div class="btn-close" onclick="handleCloseSecondaryPopup()"></div>
+		</div>
+	</div>
+	<div id="get-life" onclick="handleHideSharePrompt()">
+		<img src="./img/share_content.png">
+	</div>
+	<div id="loading">
+		<img src="./img/loading.png">
+	</div>
+	<div id="alert">
+		<div class="text">{{@alertText}}</div>
+	</div>
+	<div id="accident-prompt">
+		<div class="text">{{@accidentPrompt}}</div>
+	</div>
+	<script type="text/javascript">
+		window.fromId = '{$smarty.get.from_id}';
+	</script>
+	<script type="text/javascript" charset="utf-8" src="./js/avalon.min.js?0729"></script>
+	<script type="text/javascript" charset="utf-8" src="./js/jquery-3.1.0.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="./js/touch.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="./js/parkour.min.js?081104"></script>
+	<script type="text/javascript" charset="utf-8" src="./js/resLoader.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="./js/jquery.cookie.min.js"></script>
+</body>
+</html>
