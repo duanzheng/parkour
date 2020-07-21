@@ -1,2 +1,6 @@
 # parkour
-我在美乐乐做的一个canvas跑酷游戏
+A parkour game based on native canvas.
+
+一个基于原生 canvas 的跑酷游戏。
+
+![screenshot](./img/screenshot.png)
